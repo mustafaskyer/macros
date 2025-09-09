@@ -1,3 +1,5 @@
+use std::num::ParseIntError;
+
 macro_rules! our_macro {
     () => {};
     ($e1: expr, $e2: expr) => {
@@ -70,6 +72,65 @@ make_struct!(Person {
     name: String,
     age: u8
 });
+
+/*
+Question Mark Operator
+*/
+fn parse_string(input: &str) -> Result<i32, ParseIntError> {
+    let integer = input.parse()?;
+    println!("the value {:?} is integer {:?}", input, integer);
+    Ok(integer)
+}
+
+fn divisor(divident: f64, divisor: f64) -> Result<f64, String> {
+    let answer = match divisor {
+        0.0 => Err(String::from("Error: Divison by zero!!")),
+        _ => Ok(divident / divisor),
+    };
+    let correct = answer?;
+    println!("This line will not print in case of error {:?}", correct);
+    Ok(correct)
+}
+
+#[derive(Debug)]
+enum MathError {
+    DivisionError_DivisionByZero,
+    LogError_NonPositiveLogrithm,
+    SqrtError_NegativeSquareRoot,
+}
+type MathResult = Result<(), MathError>;
+fn division(x: f64, y: f64) -> MathResult {
+    if (y == 0.0) {
+        Err(MathError::DivisionError_DivisionByZero)
+    } else {
+        println!("success division {}", x / y);
+        Ok(())
+    }
+}
+fn sqrt(x: f64) -> MathResult {
+    if x <= 0.0 {
+        Err(MathError::SqrtError_NegativeSquareRoot)
+    } else {
+        println!("success sqrt {}", x.sqrt());
+        Ok(())
+    }
+}
+fn ln(x: f64) -> MathResult {
+    if x <= 0.0 {
+        Err(MathError::SqrtError_NegativeSquareRoot)
+    } else {
+        println!("success ln {}", x.ln());
+        Ok(())
+    }
+}
+
+fn operations(x: f64, y: f64) -> MathResult {
+    division(x, y)?;
+    sqrt(x)?;
+    ln(x)?;
+
+    Ok(())
+}
 fn main() {
     // println!("{}", our_macro!());
     // println!("{}", our_macro!(1, 2));
@@ -96,16 +157,44 @@ fn main() {
     /*
     Repeating Patterns
      */
-    let str_null = string_concat!();
-    let str_single = string_concat!("Hello");
-    let str_single = string_concat!("Hello", "World");
+    // let str_null = string_concat!();
+    // let str_single = string_concat!("Hello");
+    // let str_single = string_concat!("Hello", "World");
 
-    let str_vec = vec_macro!(1, 2, 3, 4, 5);
-    println!("{:?}", str_vec);
+    // let str_vec = vec_macro!(1, 2, 3, 4, 5);
+    // println!("{:?}", str_vec);
 
-    let p = Person {
-        name: String::from("Alice"),
-        age: 30,
+    // let p = Person {
+    //     name: String::from("Alice"),
+    //     age: 30,
+    // };
+    // println!("Name: {}, Age: {}", p.name, p.age);
+
+    /*
+    Question Operator
+     */
+    let some_value = vec!["123", "some1", "some(123)", "abc", "53"];
+    for value in some_value {
+        println!("{:?}", parse_string(value));
+    }
+
+    println!(
+        "Call from main with result equals to {:?}",
+        divisor(9.0, 3.0)
+    );
+    println!(
+        "Call from main with result equals to {:?}",
+        divisor(4.0, 0.0)
+    );
+    println!(
+        "Call from main with result equals to {:?}",
+        divisor(0.0, 2.0)
+    );
+
+    let result = operations(0.0, 19.0);
+    if result.is_ok() {
+        println!("Success result")
+    } else {
+        println!("{:?}", result);
     };
-    println!("Name: {}, Age: {}", p.name, p.age);
 }
